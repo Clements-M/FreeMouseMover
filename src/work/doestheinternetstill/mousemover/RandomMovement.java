@@ -3,12 +3,12 @@ package work.doestheinternetstill.mousemover;
 import java.awt.Point;
 import java.util.Random;
 
-public class RandomMovement implements Movement{
-	
+public class RandomMovement implements Movement {
+
 	private int topLeftX, topLeftY;
 	private int botRightX, botRightY;
-    Random random;
-	
+	Random random;
+
 	public RandomMovement(int topLeftX, int topLeftY, int botRightX, int botRightY) {
 		this.topLeftX = topLeftX;
 		this.topLeftY = topLeftY;
@@ -16,7 +16,7 @@ public class RandomMovement implements Movement{
 		this.botRightY = botRightY;
 		random = new Random();
 	}
-	
+
 	public RandomMovement(Point topLeftPoint, Point bottomRightPoint) {
 		topLeftX = (int) topLeftPoint.getX();
 		topLeftY = (int) topLeftPoint.getY();
@@ -26,9 +26,9 @@ public class RandomMovement implements Movement{
 	}
 
 	public Point generateNextMouseLocation() {
-        int pointX = topLeftX + random.nextInt((botRightX-topLeftX));
-        int pointY = topLeftY + random.nextInt((botRightY-topLeftY));
-        return new Point(pointX, pointY);
+		int pointX = topLeftX + random.nextInt((botRightX - topLeftX));
+		int pointY = topLeftY + random.nextInt((botRightY - topLeftY));
+		return new Point(pointX, pointY);
 	}
 
 }
