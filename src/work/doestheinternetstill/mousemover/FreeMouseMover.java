@@ -18,6 +18,8 @@ public class FreeMouseMover {
         Robot robot = new Robot();
         Movement nextMove;
         
+        new work.doestheinternetstill.mousemover.gui.MouseMoverGui().showGui();
+        
         {
         	//TODO Determine the movement type based on the radio button that is selected
         	// or command line option?
@@ -30,7 +32,7 @@ public class FreeMouseMover {
         while (iterationCount < ITERATION_AMOUNT) {
         	Point nextLocation = nextMove.generateNextMouseLocation();
         	
-            robot.mouseMove((int) nextLocation.getX(), (int) nextLocation.getY());
+            //robot.mouseMove((int) nextLocation.getX(), (int) nextLocation.getY());
             
             Thread.sleep(SLEEP_INTERVAL);
             

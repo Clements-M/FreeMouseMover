@@ -18,5 +18,4 @@ class TestOptions {
 		testOptions.setMovementType(Options.MovementType.RANDOM);
 		assertEquals(Options.MovementType.RANDOM, testOptions.getMovementType());
 	}
-
 }
