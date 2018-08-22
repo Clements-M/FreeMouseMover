@@ -7,6 +7,10 @@ public class Options {
 
 	MovementType movementType;
 
+	public enum MovementSpeed {
+		HIGH, MEDIUM, LOW
+	}
+
 	public Options() {
 		;
 	}
