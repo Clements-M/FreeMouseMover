@@ -1,5 +1,6 @@
 package work.doestheinternetstill.mousemover;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Robot;
 
@@ -45,17 +46,34 @@ public class FreeMouseMover {
 			new work.doestheinternetstill.mousemover.gui.MouseMoverGui().showGui();
 		}
 
-		/******************
-		 * 888 Code for
-		 */
+		int sleepAmount;
+
+		{
+
+			final Options.MovementSpeed inputMovementSpeed = Options.MovementSpeed.HIGH;
+			switch (inputMovementSpeed) {
+			case HIGH:
+				sleepAmount = 250;
+				break;
+			case MEDIUM:
+				sleepAmount = 1000;
+				break;
+			case LOW:
+			default:
+				sleepAmount = 2500;
+				break;
+			}
+		}
+
 		{
 			{
 				final Options.MovementType inputMovementType = Options.MovementType.JITTER;
 				switch (inputMovementType) {
 				case RANDOM:
-					nextMove = new RandomMovement(MIN_X, MIN_Y, MAX_X, MAX_Y);
+					nextMove = generateRandomScreenMovement();
 					break;
 				case CIRCULAR:
+					// TODO nextMove = new CircularMovement();
 				case PATH:
 				case JITTER:
 				default:
@@ -66,15 +84,28 @@ public class FreeMouseMover {
 
 			int iterationCount = 0;
 
+			/*
+			 * while(TimerThread - > getTime < waitTime){ Point nextLocation =
+			 * nextMove.generateNextMouseLocation(); robot.mouseMove((int)
+			 * nextLocation.getX(), (int) nextLocation.getY());
+			 * Thread.sleep(SLEEP_INTERVAL); TimerThread.updateTime(); }
+			 */
 			while (iterationCount < ITERATION_AMOUNT) {
 				Point nextLocation = nextMove.generateNextMouseLocation();
 
-				// robot.mouseMove((int) nextLocation.getX(), (int) nextLocation.getY());
+				robot.mouseMove((int) nextLocation.getX(), (int) nextLocation.getY());
 
-				Thread.sleep(SLEEP_INTERVAL);
+				Thread.sleep(sleepAmount);
 
 				iterationCount++;
 			}
 		}
+	}
+
+	public static RandomMovement generateRandomScreenMovement() {
+		Dimension mainScreenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+		final Point topLeft = new Point(0, 0);
+		final Point bottomRight = new Point((int) mainScreenSize.getWidth(), (int) mainScreenSize.getHeight());
+		return new RandomMovement(topLeft, bottomRight);
 	}
 }
