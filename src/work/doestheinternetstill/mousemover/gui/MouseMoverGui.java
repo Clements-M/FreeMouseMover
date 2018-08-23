@@ -11,8 +11,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.JTextField;
 
 public class MouseMoverGui {
 	public void showGui() {
@@ -30,25 +28,17 @@ public class MouseMoverGui {
 }
 
 class GridBagWindow extends JFrame {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private JButton startBtn;
 	private JButton stopBtn;
 
-	private JComboBox modeCombo;
-	private JComboBox speedCombo;
+	private JComboBox<String> modeCombo;
+	private JComboBox<String> speedCombo;
 
 	private JLabel tagLbl;
 	private JLabel tagModeLbl;
 	private JLabel previewLbl;
-
-	private JTable resTable;
-
-	private JTextField tagTxt;
 
 	public GridBagWindow() {
 		Container contentPane = getContentPane();

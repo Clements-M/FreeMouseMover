@@ -1,6 +1,5 @@
 package work.doestheinternetstill.mousemover;
 
-import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Robot;
 
@@ -70,7 +69,7 @@ public class FreeMouseMover {
 				final Options.MovementType inputMovementType = Options.MovementType.JITTER;
 				switch (inputMovementType) {
 				case RANDOM:
-					nextMove = generateRandomScreenMovement();
+					nextMove = RandomMovement.generateRandomScreenMovement();
 					break;
 				case CIRCULAR:
 					// TODO nextMove = new CircularMovement();
@@ -100,12 +99,5 @@ public class FreeMouseMover {
 				iterationCount++;
 			}
 		}
-	}
-
-	public static RandomMovement generateRandomScreenMovement() {
-		Dimension mainScreenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-		final Point topLeft = new Point(0, 0);
-		final Point bottomRight = new Point((int) mainScreenSize.getWidth(), (int) mainScreenSize.getHeight());
-		return new RandomMovement(topLeft, bottomRight);
 	}
 }
