@@ -19,6 +19,8 @@ public class FreeMouseMover {
 	public static final int MAX_Y = 400;
 	public static final int MAX_X = 400;
 
+	private static boolean runFlag = false;
+
 	public static void main(String... args) throws Exception {
 		Robot robot = new Robot();
 		Movement nextMove;
@@ -89,15 +91,20 @@ public class FreeMouseMover {
 			 * nextLocation.getX(), (int) nextLocation.getY());
 			 * Thread.sleep(SLEEP_INTERVAL); TimerThread.updateTime(); }
 			 */
-			while (iterationCount < ITERATION_AMOUNT) {
-				Point nextLocation = nextMove.generateNextMouseLocation();
-
-				robot.mouseMove((int) nextLocation.getX(), (int) nextLocation.getY());
-
-				Thread.sleep(sleepAmount);
-
-				iterationCount++;
+			while (true) {
+				if (runFlag) {
+					while (iterationCount < ITERATION_AMOUNT) {
+						Point nextLocation = nextMove.generateNextMouseLocation();
+						robot.mouseMove((int) nextLocation.getX(), (int) nextLocation.getY());
+						Thread.sleep(sleepAmount);
+						iterationCount++;
+					}
+				}
 			}
 		}
+	}
+
+	public static void toggleRunFlag() {
+		runFlag = !runFlag;
 	}
 }

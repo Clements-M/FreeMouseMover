@@ -4,6 +4,8 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -11,6 +13,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import work.doestheinternetstill.mousemover.FreeMouseMover;
 
 public class MouseMoverGui {
 	public void showGui() {
@@ -27,7 +31,7 @@ public class MouseMoverGui {
 	}
 }
 
-class GridBagWindow extends JFrame {
+class GridBagWindow extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	private JButton startBtn;
@@ -83,12 +87,14 @@ class GridBagWindow extends JFrame {
 		constraints.gridy = 2;
 		gridbag.setConstraints(stopBtn, constraints);
 		contentPane.add(stopBtn);
+		stopBtn.addActionListener(this);
 
 		startBtn = new JButton("Start");
 		constraints.gridx = 0;
 		constraints.gridy = 2;
 		gridbag.setConstraints(startBtn, constraints);
 		contentPane.add(startBtn);
+		startBtn.addActionListener(this);
 
 		previewLbl = new JLabel("Stopped - F6 To Start");
 		constraints.gridx = 0;
@@ -101,5 +107,10 @@ class GridBagWindow extends JFrame {
 				System.exit(0);
 			}
 		});
+
+	}
+
+	public void actionPerformed(ActionEvent e) {
+		FreeMouseMover.toggleRunFlag();
 	}
 }
