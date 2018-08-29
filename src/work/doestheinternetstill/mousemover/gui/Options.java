@@ -1,14 +1,38 @@
 package work.doestheinternetstill.mousemover.gui;
 
+import work.doestheinternetstill.mousemover.JitterMovement;
+import work.doestheinternetstill.mousemover.Movement;
+import work.doestheinternetstill.mousemover.RandomMovement;
+
 public class Options {
 	public enum MovementType {
-		RANDOM, JITTER, CIRCULAR, PATH
+		Random(RandomMovement.generateRandomScreenMovement()), Jitter(new JitterMovement());
+
+		private Movement movementTypeObject;
+
+		private MovementType(Movement movementTypeObject) {
+			this.movementTypeObject = movementTypeObject;
+		}
+
+		public Movement getM0vementTypeObject() {
+			return movementTypeObject;
+		}
 	}
 
 	MovementType movementType;
 
 	public enum MovementSpeed {
-		HIGH, MEDIUM, LOW
+		High(250), Medium(1000), Low(2500);
+
+		private int speedValueInverse;
+
+		private MovementSpeed(int speedValueInverse) {
+			this.speedValueInverse = speedValueInverse;
+		}
+
+		public int getInverseSpeed() {
+			return speedValueInverse;
+		}
 	}
 
 	public Options() {

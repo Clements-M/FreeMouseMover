@@ -13,10 +13,24 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
-import work.doestheinternetstill.mousemover.FreeMouseMover;
+import work.doestheinternetstill.mousemover.MovementManager;
+import work.doestheinternetstill.mousemover.gui.Options.MovementSpeed;
+import work.doestheinternetstill.mousemover.gui.Options.MovementType;
 
 public class MouseMoverGui {
+
+	public MouseMoverGui() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			;
+		} // TODO Properly handle these exceptions
+	}
+
 	public void showGui() {
 		GridBagWindow frame = new GridBagWindow();
 
@@ -24,10 +38,6 @@ public class MouseMoverGui {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.pack();
 		frame.setVisible(true);
-	}
-
-	public void getOptions() {
-
 	}
 }
 
@@ -37,12 +47,14 @@ class GridBagWindow extends JFrame implements ActionListener {
 	private JButton startBtn;
 	private JButton stopBtn;
 
-	private JComboBox<String> modeCombo;
-	private JComboBox<String> speedCombo;
+	private JComboBox<MovementType> modeCombo;
+	private JComboBox<MovementSpeed> speedCombo;
 
 	private JLabel tagLbl;
 	private JLabel tagModeLbl;
 	private JLabel previewLbl;
+
+	private boolean startEnabledStopDisabled = true;
 
 	public GridBagWindow() {
 		Container contentPane = getContentPane();
@@ -60,8 +72,8 @@ class GridBagWindow extends JFrame implements ActionListener {
 		gridbag.setConstraints(tagModeLbl, constraints);
 		contentPane.add(tagModeLbl);
 
-		String[] modeOptions = { "Random", "Jitter", "Circular" };
-		modeCombo = new JComboBox<String>(modeOptions);
+		MovementType[] modeOptions = { MovementType.Random, MovementType.Jitter };
+		modeCombo = new JComboBox<MovementType>(modeOptions);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
@@ -74,8 +86,8 @@ class GridBagWindow extends JFrame implements ActionListener {
 		gridbag.setConstraints(tagLbl, constraints); // associate the label with a constraint object
 		contentPane.add(tagLbl); // add it to content pane
 
-		String[] speedOptions = { "High", "Medium", "Low" };
-		speedCombo = new JComboBox<String>(speedOptions);
+		MovementSpeed[] speedOptions = { MovementSpeed.High, MovementSpeed.Medium, MovementSpeed.Low };
+		speedCombo = new JComboBox<MovementSpeed>(speedOptions);
 		constraints.gridx = 1;
 		constraints.gridy = 1;
 		constraints.gridwidth = 1;
@@ -87,6 +99,7 @@ class GridBagWindow extends JFrame implements ActionListener {
 		constraints.gridy = 2;
 		gridbag.setConstraints(stopBtn, constraints);
 		contentPane.add(stopBtn);
+		stopBtn.setEnabled(!startEnabledStopDisabled);
 		stopBtn.addActionListener(this);
 
 		startBtn = new JButton("Start");
@@ -94,6 +107,7 @@ class GridBagWindow extends JFrame implements ActionListener {
 		constraints.gridy = 2;
 		gridbag.setConstraints(startBtn, constraints);
 		contentPane.add(startBtn);
+		startBtn.setEnabled(startEnabledStopDisabled);
 		startBtn.addActionListener(this);
 
 		previewLbl = new JLabel("Stopped - F6 To Start");
@@ -110,7 +124,25 @@ class GridBagWindow extends JFrame implements ActionListener {
 
 	}
 
+	private void toggleStartStopButtons() {
+		startEnabledStopDisabled = !startEnabledStopDisabled;
+		stopBtn.setEnabled(!startEnabledStopDisabled);
+		startBtn.setEnabled(startEnabledStopDisabled);
+	}
+
 	public void actionPerformed(ActionEvent e) {
-		FreeMouseMover.toggleRunFlag();
+		new Runnable() {
+
+			@Override
+			public void run() {
+				toggleStartStopButtons();
+
+				repaint();
+
+			}
+		};
+
+		MovementManager.toggleMovement((Options.MovementType) modeCombo.getSelectedItem(),
+				(Options.MovementSpeed) speedCombo.getSelectedItem());
 	}
 }

@@ -14,7 +14,7 @@ class TestOptions {
 	@Test
 	void test() {
 		Options testOptions = new Options();
-		testOptions.setMovementType(Options.MovementType.RANDOM);
-		assertEquals(Options.MovementType.RANDOM, testOptions.getMovementType());
+		testOptions.setMovementType(Options.MovementType.Random);
+		assertEquals(Options.MovementType.Random, testOptions.getMovementType());
 	}
 }
