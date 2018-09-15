@@ -15,17 +15,17 @@ public class MovementManager {
 	static Robot robot;
 
 	// FIXME: Why do I have these constants?
-	public static final int SLEEP_INTERVAL = 1000;
 	public static final int ITERATION_AMOUNT = 1200;
 
-	public static void toggleMovement(Options.MovementType movementType, Options.MovementSpeed movementSpeed) {
+	public static void toggleMovement(Options.MovementType movementType, Options.MovementSpeed movementSpeed,
+			int duration) {
 		runToggle = !runToggle;
 		if (runToggle) {
 			// run toggle weas previously false, now it is set to true, therefore we must
 			// run
 			setMovementSpeed(movementSpeed);
 			setMovementType(movementType);
-			startMovement();
+			startMovement(duration);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class MovementManager {
 		movement = inputMovementType.getM0vementTypeObject();
 	}
 
-	private static void startMovement() {
+	private static void startMovement(int duration) {
 		try {
 			robot = new Robot();
 		} catch (AWTException e) {

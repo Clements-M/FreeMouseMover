@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.concurrent.Executors;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -49,10 +50,12 @@ class GridBagWindow extends JFrame implements ActionListener {
 
 	private JComboBox<MovementType> modeCombo;
 	private JComboBox<MovementSpeed> speedCombo;
+	private JComboBox<String> durationCombo; // TODO change to number field with + / - symbol
 
 	private JLabel tagLbl;
 	private JLabel tagModeLbl;
 	private JLabel previewLbl;
+	private JLabel durationLbl;
 
 	private boolean startEnabledStopDisabled = true;
 
@@ -94,9 +97,23 @@ class GridBagWindow extends JFrame implements ActionListener {
 		gridbag.setConstraints(speedCombo, constraints);
 		contentPane.add(speedCombo);
 
-		stopBtn = new JButton("Stop");
+		durationLbl = new JLabel("Duration");
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		gridbag.setConstraints(durationLbl, constraints);
+		contentPane.add(durationLbl);
+
+		String[] durationOptions = { "1", "2", "3" }; // ETC
+		durationCombo = new JComboBox<String>(durationOptions);
 		constraints.gridx = 1;
 		constraints.gridy = 2;
+		constraints.gridwidth = 1;
+		gridbag.setConstraints(durationCombo, constraints);
+		contentPane.add(durationCombo);
+
+		stopBtn = new JButton("Stop");
+		constraints.gridx = 1;
+		constraints.gridy = 3;
 		gridbag.setConstraints(stopBtn, constraints);
 		contentPane.add(stopBtn);
 		stopBtn.setEnabled(!startEnabledStopDisabled);
@@ -104,7 +121,7 @@ class GridBagWindow extends JFrame implements ActionListener {
 
 		startBtn = new JButton("Start");
 		constraints.gridx = 0;
-		constraints.gridy = 2;
+		constraints.gridy = 3;
 		gridbag.setConstraints(startBtn, constraints);
 		contentPane.add(startBtn);
 		startBtn.setEnabled(startEnabledStopDisabled);
@@ -112,7 +129,7 @@ class GridBagWindow extends JFrame implements ActionListener {
 
 		previewLbl = new JLabel("Stopped - F6 To Start");
 		constraints.gridx = 0;
-		constraints.gridy = 3;
+		constraints.gridy = 4;
 		gridbag.setConstraints(previewLbl, constraints);
 		contentPane.add(previewLbl);
 
@@ -131,18 +148,16 @@ class GridBagWindow extends JFrame implements ActionListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		new Runnable() {
+		toggleStartStopButtons();
 
+		int duration = Integer.valueOf(durationCombo.getSelectedItem().toString());
+
+		Executors.newSingleThreadExecutor().submit(new Runnable() {
 			@Override
 			public void run() {
-				toggleStartStopButtons();
-
-				repaint();
-
+				MovementManager.toggleMovement((Options.MovementType) modeCombo.getSelectedItem(),
+						(Options.MovementSpeed) speedCombo.getSelectedItem(), duration);
 			}
-		};
-
-		MovementManager.toggleMovement((Options.MovementType) modeCombo.getSelectedItem(),
-				(Options.MovementSpeed) speedCombo.getSelectedItem());
+		});
 	}
 }
