@@ -1,11 +1,14 @@
 package work.doestheinternetstill.mousemover.gui;
 
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.concurrent.Executors;
@@ -14,6 +17,9 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
@@ -37,12 +43,13 @@ public class MouseMoverGui {
 
 		frame.setTitle("Free Mouse Mover");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setResizable(false);
 		frame.pack();
 		frame.setVisible(true);
 	}
 }
 
-class GridBagWindow extends JFrame implements ActionListener {
+class GridBagWindow extends JFrame implements ActionListener, KeyListener {
 	private static final long serialVersionUID = 1L;
 
 	private JButton startBtn;
@@ -50,10 +57,12 @@ class GridBagWindow extends JFrame implements ActionListener {
 
 	private JComboBox<MovementType> modeCombo;
 	private JComboBox<MovementSpeed> speedCombo;
-	private JComboBox<String> durationCombo; // TODO change to number field with + / - symbol
 
-	private JLabel tagLbl;
-	private JLabel tagModeLbl;
+	private JSpinner duration;
+	private SpinnerModel durationModel;
+
+	private JLabel speedLbl;
+	private JLabel modeLbl;
 	private JLabel previewLbl;
 	private JLabel durationLbl;
 
@@ -63,53 +72,67 @@ class GridBagWindow extends JFrame implements ActionListener {
 		Container contentPane = getContentPane();
 		GridBagLayout gridbag = new GridBagLayout();
 		contentPane.setLayout(gridbag);
+		contentPane.setFocusable(true);
+		contentPane.addKeyListener(this);
 
 		GridBagConstraints constraints = new GridBagConstraints();
 		constraints.insets = new Insets(5, 5, 5, 5);
 		constraints.gridwidth = GridBagConstraints.REMAINDER;
 		constraints.fill = GridBagConstraints.BOTH;
 
-		tagModeLbl = new JLabel("Movement Mode");
+		modeLbl = new JLabel("Movement Mode");
+		modeLbl.setFocusable(true);
+		modeLbl.addKeyListener(this);
 		constraints.gridx = 0;
 		constraints.gridy = 0;
-		gridbag.setConstraints(tagModeLbl, constraints);
-		contentPane.add(tagModeLbl);
+		gridbag.setConstraints(modeLbl, constraints);
+		contentPane.add(modeLbl);
 
 		MovementType[] modeOptions = { MovementType.Random, MovementType.Jitter };
 		modeCombo = new JComboBox<MovementType>(modeOptions);
+		modeCombo.setFocusable(true);
+		modeCombo.addKeyListener(this);
 		constraints.gridx = 1;
 		constraints.gridy = 0;
 		constraints.gridwidth = 1;
 		gridbag.setConstraints(modeCombo, constraints);
 		contentPane.add(modeCombo);
 
-		tagLbl = new JLabel("Speed");
+		speedLbl = new JLabel("Speed");
+		speedLbl.setFocusable(true);
+		speedLbl.addKeyListener(this);
 		constraints.gridx = 0; // x grid position
 		constraints.gridy = 1; // y grid position
-		gridbag.setConstraints(tagLbl, constraints); // associate the label with a constraint object
-		contentPane.add(tagLbl); // add it to content pane
+		gridbag.setConstraints(speedLbl, constraints); // associate the label with a constraint object
+		contentPane.add(speedLbl); // add it to content pane
 
 		MovementSpeed[] speedOptions = { MovementSpeed.High, MovementSpeed.Medium, MovementSpeed.Low };
 		speedCombo = new JComboBox<MovementSpeed>(speedOptions);
+		speedCombo.setFocusable(true);
+		speedCombo.addKeyListener(this);
 		constraints.gridx = 1;
 		constraints.gridy = 1;
 		constraints.gridwidth = 1;
 		gridbag.setConstraints(speedCombo, constraints);
 		contentPane.add(speedCombo);
 
-		durationLbl = new JLabel("Duration");
+		durationLbl = new JLabel("Duration (Minutes)");
+		durationLbl.setFocusable(true);
+		durationLbl.addKeyListener(this);
 		constraints.gridx = 0;
 		constraints.gridy = 2;
 		gridbag.setConstraints(durationLbl, constraints);
 		contentPane.add(durationLbl);
 
-		String[] durationOptions = { "1", "2", "3" }; // ETC
-		durationCombo = new JComboBox<String>(durationOptions);
+		durationModel = new SpinnerNumberModel(3.5, 0.5, 999, 0.5);
+		duration = new JSpinner(durationModel);
+		duration.setFocusable(false);
+		duration.addKeyListener(this);
 		constraints.gridx = 1;
 		constraints.gridy = 2;
 		constraints.gridwidth = 1;
-		gridbag.setConstraints(durationCombo, constraints);
-		contentPane.add(durationCombo);
+		gridbag.setConstraints(duration, constraints);
+		contentPane.add(duration);
 
 		stopBtn = new JButton("Stop");
 		constraints.gridx = 1;
@@ -118,6 +141,8 @@ class GridBagWindow extends JFrame implements ActionListener {
 		contentPane.add(stopBtn);
 		stopBtn.setEnabled(!startEnabledStopDisabled);
 		stopBtn.addActionListener(this);
+		stopBtn.setFocusable(true);
+		stopBtn.addKeyListener(this);
 
 		startBtn = new JButton("Start");
 		constraints.gridx = 0;
@@ -126,8 +151,15 @@ class GridBagWindow extends JFrame implements ActionListener {
 		contentPane.add(startBtn);
 		startBtn.setEnabled(startEnabledStopDisabled);
 		startBtn.addActionListener(this);
+		startBtn.setFocusable(true);
+		startBtn.addKeyListener(this);
 
 		previewLbl = new JLabel("Stopped - F6 To Start");
+		previewLbl.setMaximumSize(new Dimension(116, 17));
+		previewLbl.setMinimumSize(new Dimension(116, 17));
+		previewLbl.setPreferredSize(new Dimension(116, 17));
+		previewLbl.setFocusable(true);
+		previewLbl.addKeyListener(this);
 		constraints.gridx = 0;
 		constraints.gridy = 4;
 		gridbag.setConstraints(previewLbl, constraints);
@@ -145,19 +177,58 @@ class GridBagWindow extends JFrame implements ActionListener {
 		startEnabledStopDisabled = !startEnabledStopDisabled;
 		stopBtn.setEnabled(!startEnabledStopDisabled);
 		startBtn.setEnabled(startEnabledStopDisabled);
+		if (!startEnabledStopDisabled)
+			previewLbl.setText("Started - F6 To Stop");
+		if (startEnabledStopDisabled)
+			previewLbl.setText("Stopped - F6 To Start");
 	}
 
-	public void actionPerformed(ActionEvent e) {
+	private void stopRun() {
+		MovementManager.stopRun();
 		toggleStartStopButtons();
+	}
 
-		int duration = Integer.valueOf(durationCombo.getSelectedItem().toString());
+	private void startRun() {
+		double durationInt = (double) duration.getValue();
 
 		Executors.newSingleThreadExecutor().submit(new Runnable() {
 			@Override
 			public void run() {
 				MovementManager.toggleMovement((Options.MovementType) modeCombo.getSelectedItem(),
-						(Options.MovementSpeed) speedCombo.getSelectedItem(), duration);
+						(Options.MovementSpeed) speedCombo.getSelectedItem(), durationInt);
+
+				toggleStartStopButtons();
 			}
 		});
 	}
+
+	public void actionPerformed(ActionEvent e) {
+		if (startEnabledStopDisabled)
+			startRun();
+		if (!startEnabledStopDisabled)
+			stopRun();
+		toggleStartStopButtons();
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_F6) {
+			if (startEnabledStopDisabled)
+				startRun();
+			if (!startEnabledStopDisabled)
+				stopRun();
+			toggleStartStopButtons();
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		; // Do nothing
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		;
+	}
+
 }

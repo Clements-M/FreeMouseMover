@@ -8,25 +8,16 @@ import work.doestheinternetstill.mousemover.gui.Options;
 import work.doestheinternetstill.mousemover.gui.Options.MovementSpeed;
 
 public class MovementManager {
-
-	public static boolean runToggle = false;
+	private static boolean runToggle = false;
 	private static int sleepValue;
 	private static Movement movement;
 	static Robot robot;
 
-	// FIXME: Why do I have these constants?
-	public static final int ITERATION_AMOUNT = 1200;
-
 	public static void toggleMovement(Options.MovementType movementType, Options.MovementSpeed movementSpeed,
-			int duration) {
-		runToggle = !runToggle;
-		if (runToggle) {
-			// run toggle weas previously false, now it is set to true, therefore we must
-			// run
-			setMovementSpeed(movementSpeed);
-			setMovementType(movementType);
-			startMovement(duration);
-		}
+			double duration) {
+		setMovementSpeed(movementSpeed);
+		setMovementType(movementType);
+		startMovement(duration);
 	}
 
 	private static void setMovementSpeed(MovementSpeed movementSpeed) {
@@ -37,7 +28,19 @@ public class MovementManager {
 		movement = inputMovementType.getM0vementTypeObject();
 	}
 
-	private static void startMovement(int duration) {
+	private static void loopMovementAction() {
+		{
+			Point nextLocation = movement.generateNextMouseLocation();
+			robot.mouseMove((int) nextLocation.getX(), (int) nextLocation.getY());
+		}
+		try {
+			Thread.sleep(sleepValue); // TODO make thread safe - causing slight pause after stopping
+		} catch (InterruptedException e) {
+			;
+		} // TODO Properly handle these exceptions
+	}
+
+	private static void startMovement(double duration) {
 		try {
 			robot = new Robot();
 		} catch (AWTException e) {
@@ -48,26 +51,24 @@ public class MovementManager {
 
 			@Override
 			public void run() {
-				int iterationCount = 0;
+				long startTime = System.currentTimeMillis();
+				long currentTime = startTime;
+				long endTime = (long) ((long) startTime + (duration * 60000));
 
-				while (iterationCount < ITERATION_AMOUNT && runToggle) {
-					// TODO Move into own method - call method from action handler
-					// requires moving the nextlocation to a new scope?
-					// requires moving nextMobve to a new location too I think.
-					{
-						Point nextLocation = movement.generateNextMouseLocation();
-						robot.mouseMove((int) nextLocation.getX(), (int) nextLocation.getY());
-					}
-					try {
-						Thread.sleep(sleepValue);
-					} catch (InterruptedException e) {
-						;
-					} // TODO Properly handle these exceptions
-					iterationCount++;
+				runToggle = true;
+
+				while (currentTime < endTime && runToggle) {
+					loopMovementAction();
+					currentTime = System.currentTimeMillis();
 				}
+
+				runToggle = false;
 			}
 		}.run();
 		;
 	}
 
+	public static void stopRun() {
+		runToggle = false;
+	}
 }
