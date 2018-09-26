@@ -116,7 +116,7 @@ class GridBagWindow extends JFrame implements ActionListener, KeyListener {
 		gridbag.setConstraints(speedCombo, constraints);
 		contentPane.add(speedCombo);
 
-		durationLbl = new JLabel("Duration (Minutes)");
+		durationLbl = new JLabel("Duration (Seconds)");
 		durationLbl.setFocusable(true);
 		durationLbl.addKeyListener(this);
 		constraints.gridx = 0;
@@ -124,7 +124,7 @@ class GridBagWindow extends JFrame implements ActionListener, KeyListener {
 		gridbag.setConstraints(durationLbl, constraints);
 		contentPane.add(durationLbl);
 
-		durationModel = new SpinnerNumberModel(3.5, 0.5, 999, 0.5);
+		durationModel = new SpinnerNumberModel(10, 1, 10000, 1.0);
 		duration = new JSpinner(durationModel);
 		duration.setFocusable(false);
 		duration.addKeyListener(this);
@@ -189,13 +189,11 @@ class GridBagWindow extends JFrame implements ActionListener, KeyListener {
 	}
 
 	private void startRun() {
-		double durationInt = (double) duration.getValue();
-
 		Executors.newSingleThreadExecutor().submit(new Runnable() {
 			@Override
 			public void run() {
 				MovementManager.toggleMovement((Options.MovementType) modeCombo.getSelectedItem(),
-						(Options.MovementSpeed) speedCombo.getSelectedItem(), durationInt);
+						(Options.MovementSpeed) speedCombo.getSelectedItem(), (double) duration.getValue());
 
 				toggleStartStopButtons();
 			}

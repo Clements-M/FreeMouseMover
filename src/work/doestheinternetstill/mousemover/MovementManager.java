@@ -53,7 +53,7 @@ public class MovementManager {
 			public void run() {
 				long startTime = System.currentTimeMillis();
 				long currentTime = startTime;
-				long endTime = (long) ((long) startTime + (duration * 60000));
+				long endTime = (long) ((long) startTime + (duration * 1000));
 
 				runToggle = true;
 
